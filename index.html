@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande de simulation de salaire — Edgard</title>
+<style>
+  :root{
+    --ivoire:#f7f3ec;
+    --espresso:#3b2f26;
+    --or:#b8905a;
+    --or-fonce:#96723f;
+    --gris:#8a8078;
+    --erreur:#b0463c;
+    --succes:#4c7a4f;
+    --bord:#e4dccd;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--ivoire);
+    color:var(--espresso);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .carte{
+    background:#fff;
+    border:1px solid var(--bord);
+    border-radius:14px;
+    max-width:560px;
+    width:100%;
+    padding:28px 26px 32px;
+    box-shadow:0 4px 18px rgba(59,47,38,.06);
+  }
+  h1{
+    font-size:20px;
+    margin:0 0 4px;
+    color:var(--espresso);
+  }
+  .sous-titre{
+    font-size:13.5px;
+    color:var(--gris);
+    margin:0 0 24px;
+    line-height:1.5;
+  }
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--espresso);
+    margin:16px 0 6px;
+  }
+  .ligne2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .ligne3{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+  }
+  @media (max-width:480px){
+    .ligne3{grid-template-columns:1fr}
+  }
+  input[type=date], input[type=number]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--bord);
+    border-radius:8px;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--espresso);
+    background:var(--ivoire);
+    transition:border-color .15s;
+  }
+  input[type=date]:focus, input[type=number]:focus{
+    outline:none;
+    border-color:var(--or);
+  }
+  input[type=text], textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--bord);
+    border-radius:8px;
+    font-size:14.5px;
+    font-family:inherit;
+    color:var(--espresso);
+    background:var(--ivoire);
+    transition:border-color .15s;
+  }
+  input[type=text]:focus, textarea:focus{
+    outline:none;
+    border-color:var(--or);
+  }
+  textarea{
+    min-height:110px;
+    resize:vertical;
+  }
+  .zone-cv{
+    border:2px dashed var(--bord);
+    border-radius:10px;
+    padding:18px;
+    text-align:center;
+    cursor:pointer;
+    background:var(--ivoire);
+    transition:border-color .15s, background .15s;
+  }
+  .zone-cv.actif{
+    border-color:var(--or);
+  }
+  .zone-cv.rempli{
+    border-color:var(--succes);
+    background:#f2f7f2;
+  }
+  .zone-cv input{display:none}
+  .zone-cv .txt{
+    font-size:13.5px;
+    color:var(--gris);
+  }
+  .zone-cv .nomfichier{
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--succes);
+    margin-top:4px;
+    word-break:break-all;
+  }
+  .btn{
+    width:100%;
+    margin-top:24px;
+    padding:13px 16px;
+    background:var(--or);
+    color:#fff;
+    border:none;
+    border-radius:9px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .15s, opacity .15s;
+  }
+  .btn:hover:not(:disabled){background:var(--or-fonce)}
+  .btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+  }
+  .msg{
+    margin-top:14px;
+    font-size:13px;
+    padding:10px 12px;
+    border-radius:8px;
+    display:none;
+  }
+  .msg.erreur{
+    display:block;
+    background:#fbebe9;
+    color:var(--erreur);
+  }
+  .msg.succes{
+    display:block;
+    background:#eaf3ea;
+    color:var(--succes);
+  }
+  .msg.info{
+    display:block;
+    background:#f1ede4;
+    color:var(--gris);
+  }
+  .spinner{
+    display:inline-block;
+    width:14px;height:14px;
+    border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:tourner .7s linear infinite;
+    vertical-align:middle;
+    margin-right:6px;
+  }
+  @keyframes tourner{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="carte">
+  <h1>Demande de simulation de salaire</h1>
+  <p class="sous-titre">Ce formulaire transmet une demande de simulation de salaire à Fabienne LA CROIX, avec le CV du candidat en pièce jointe.</p>
+
+  <form id="form">
+    <label for="societe">Société</label>
+    <input type="text" id="societe" placeholder="Ex : Edgard Opticiens Reims" required>
+
+    <div class="ligne2">
+      <div>
+        <label for="dirNom">Votre nom</label>
+        <input type="text" id="dirNom" required>
+      </div>
+      <div>
+        <label for="dirPrenom">Votre prénom</label>
+        <input type="text" id="dirPrenom" required>
+      </div>
+    </div>
+
+    <div class="ligne2">
+      <div>
+        <label for="canNom">Nom du candidat</label>
+        <input type="text" id="canNom" required>
+      </div>
+      <div>
+        <label for="canPrenom">Prénom du candidat</label>
+        <input type="text" id="canPrenom" required>
+      </div>
+    </div>
+
+    <div class="ligne3">
+      <div>
+        <label for="salaire">Salaire brut demandé (€)</label>
+        <input type="number" id="salaire" min="0" step="1" placeholder="Ex : 1850" required>
+      </div>
+      <div>
+        <label for="dateEmbauche">Date prévisionnelle d'embauche</label>
+        <input type="date" id="dateEmbauche" required>
+      </div>
+      <div>
+        <label for="heuresHebdo">Heures hebdomadaires</label>
+        <input type="number" id="heuresHebdo" min="0" max="48" step="0.5" placeholder="Ex : 35" required>
+      </div>
+    </div>
+
+    <label for="message">Message</label>
+    <textarea id="message" placeholder="Précisez votre demande (poste, salaire envisagé, particularités...)" required></textarea>
+
+    <label>CV du candidat (PDF)</label>
+    <div class="zone-cv" id="zoneCv">
+      <input type="file" id="cv" accept="application/pdf">
+      <div class="txt" id="cvTxt">Cliquez pour joindre le CV (PDF obligatoire)</div>
+      <div class="nomfichier" id="cvNom"></div>
+    </div>
+
+    <button type="submit" class="btn" id="btnEnvoyer">Envoyer la demande</button>
+    <div class="msg" id="msg"></div>
+  </form>
+</div>
+
+<script>
+(function(){
+  const WEBHOOK_URL = "https://edgard-opticiens.app.n8n.cloud/webhook/simulation-salaire";
+
+  const form = document.getElementById('form');
+  const zoneCv = document.getElementById('zoneCv');
+  const cvInput = document.getElementById('cv');
+  const cvTxt = document.getElementById('cvTxt');
+  const cvNom = document.getElementById('cvNom');
+  const btn = document.getElementById('btnEnvoyer');
+  const msg = document.getElementById('msg');
+
+  let cvBase64 = null;
+  let cvNomFichier = null;
+
+  zoneCv.addEventListener('click', ()=> cvInput.click());
+
+  cvInput.addEventListener('change', async ()=>{
+    const f = cvInput.files[0];
+    if(!f){ return; }
+    if(f.type !== 'application/pdf'){
+      afficherMsg('erreur','Le CV doit être un fichier PDF.');
+      cvInput.value = '';
+      cvBase64 = null;
+      zoneCv.classList.remove('rempli');
+      cvNom.textContent = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e){
+      cvBase64 = e.target.result.split(',')[1];
+      cvNomFichier = f.name;
+      zoneCv.classList.add('rempli');
+      zoneCv.classList.remove('actif');
+      cvTxt.textContent = 'CV joint ✓ (cliquez pour changer)';
+      cvNom.textContent = f.name;
+    };
+    reader.readAsDataURL(f);
+  });
+
+  function afficherMsg(type, texte){
+    msg.className = 'msg ' + type;
+    msg.innerHTML = texte;
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    msg.className = 'msg';
+
+    if(!cvBase64){
+      afficherMsg('erreur','⚠️ Le CV du candidat est obligatoire. L\'envoi est bloqué tant qu\'il n\'est pas joint.');
+      zoneCv.classList.add('actif');
+      zoneCv.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    const societe = document.getElementById('societe').value.trim();
+    const dirNom = document.getElementById('dirNom').value.trim();
+    const dirPrenom = document.getElementById('dirPrenom').value.trim();
+    const canNom = document.getElementById('canNom').value.trim();
+    const canPrenom = document.getElementById('canPrenom').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const salaire = document.getElementById('salaire').value.trim();
+    const dateEmbauche = document.getElementById('dateEmbauche').value;
+    const heuresHebdo = document.getElementById('heuresHebdo').value.trim();
+
+    const dateEmbaucheAffichee = dateEmbauche ? dateEmbauche.split('-').reverse().join('/') : '';
+
+    const sujet = `${societe} - ${canPrenom} ${canNom} - Demande de simulation de salaire`;
+
+    const corps =
+`Société : ${societe}
+Directeur : ${dirPrenom} ${dirNom}
+Candidat : ${canPrenom} ${canNom}
+Salaire brut demandé : ${salaire} €
+Date prévisionnelle d'embauche : ${dateEmbaucheAffichee}
+Heures hebdomadaires : ${heuresHebdo} h
+
+Message :
+${message}`;
+
+    const payload = {
+      destinataire: "f.lacroix@groupe-edgard.com",
+      sujet: sujet,
+      corps: corps,
+      societe, dirNom, dirPrenom, canNom, canPrenom, message,
+      salaire, dateEmbauche, heuresHebdo,
+      cv_base64: cvBase64,
+      cv_nom_fichier: cvNomFichier
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Envoi en cours...';
+    afficherMsg('info','Envoi de la demande...');
+
+    try{
+      const resp = await fetch(WEBHOOK_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+
+      afficherMsg('succes','✓ Votre demande a bien été envoyée à Fabienne LA CROIX.');
+      form.reset();
+      cvBase64 = null;
+      cvNomFichier = null;
+      zoneCv.classList.remove('rempli','actif');
+      cvTxt.textContent = 'Cliquez pour joindre le CV (PDF obligatoire)';
+      cvNom.textContent = '';
+      btn.textContent = 'Envoyer la demande';
+      btn.disabled = false;
+
+    }catch(err){
+      afficherMsg('erreur','❌ Une erreur est survenue lors de l\'envoi. Réessayez, ou contactez le service RH si le problème persiste.');
+      btn.disabled = false;
+      btn.textContent = 'Envoyer la demande';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
