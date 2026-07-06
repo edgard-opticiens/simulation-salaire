@@ -69,7 +69,8 @@
   }
   input[type=date], input[type=number]{
     width:100%;
-    padding:10px 12px;
+    height:40px;
+    padding:0 12px;
     border:1px solid var(--bord);
     border-radius:8px;
     font-size:14.5px;
@@ -84,7 +85,8 @@
   }
   input[type=text], textarea{
     width:100%;
-    padding:10px 12px;
+    height:40px;
+    padding:0 12px;
     border:1px solid var(--bord);
     border-radius:8px;
     font-size:14.5px;
@@ -93,13 +95,15 @@
     background:var(--ivoire);
     transition:border-color .15s;
   }
+  textarea{
+    height:auto;
+    padding:10px 12px;
+    min-height:110px;
+    resize:vertical;
+  }
   input[type=text]:focus, textarea:focus{
     outline:none;
     border-color:var(--or);
-  }
-  textarea{
-    min-height:110px;
-    resize:vertical;
   }
   .zone-cv{
     border:2px dashed var(--bord);
@@ -229,6 +233,24 @@
       </div>
     </div>
 
+    <label for="typeContrat">Type de contrat</label>
+    <select id="typeContrat" required style="width:100%;height:40px;padding:0 12px;border:1px solid var(--bord);border-radius:8px;font-size:14.5px;font-family:inherit;color:var(--espresso);background:var(--ivoire);">
+      <option value="" disabled selected>Sélectionnez...</option>
+      <option value="CDI">CDI</option>
+      <option value="CDD">CDD</option>
+    </select>
+
+    <div class="ligne2" id="blocCdd" style="display:none;">
+      <div>
+        <label for="cddDebut">Date de début du CDD</label>
+        <input type="date" id="cddDebut">
+      </div>
+      <div>
+        <label for="cddFin">Date de fin du CDD</label>
+        <input type="date" id="cddFin">
+      </div>
+    </div>
+
     <label for="message">Message</label>
     <textarea id="message" placeholder="Précisez votre demande (poste, salaire envisagé, particularités...)" required></textarea>
 
@@ -255,6 +277,24 @@
   const cvNom = document.getElementById('cvNom');
   const btn = document.getElementById('btnEnvoyer');
   const msg = document.getElementById('msg');
+  const typeContrat = document.getElementById('typeContrat');
+  const blocCdd = document.getElementById('blocCdd');
+  const cddDebut = document.getElementById('cddDebut');
+  const cddFin = document.getElementById('cddFin');
+
+  typeContrat.addEventListener('change', function(){
+    if(typeContrat.value === 'CDD'){
+      blocCdd.style.display = 'grid';
+      cddDebut.required = true;
+      cddFin.required = true;
+    }else{
+      blocCdd.style.display = 'none';
+      cddDebut.required = false;
+      cddFin.required = false;
+      cddDebut.value = '';
+      cddFin.value = '';
+    }
+  });
 
   let cvBase64 = null;
   let cvNomFichier = null;
@@ -309,10 +349,24 @@
     const salaire = document.getElementById('salaire').value.trim();
     const dateEmbauche = document.getElementById('dateEmbauche').value;
     const heuresHebdo = document.getElementById('heuresHebdo').value.trim();
+    const typeContratVal = typeContrat.value;
+    const cddDebutVal = cddDebut.value;
+    const cddFinVal = cddFin.value;
+
+    if(typeContratVal === 'CDD' && (!cddDebutVal || !cddFinVal)){
+      afficherMsg('erreur','⚠️ Merci de préciser les dates de début et de fin du CDD.');
+      return;
+    }
 
     const dateEmbaucheAffichee = dateEmbauche ? dateEmbauche.split('-').reverse().join('/') : '';
+    const cddDebutAffichee = cddDebutVal ? cddDebutVal.split('-').reverse().join('/') : '';
+    const cddFinAffichee = cddFinVal ? cddFinVal.split('-').reverse().join('/') : '';
 
     const sujet = `${societe} - ${canPrenom} ${canNom} - Demande de simulation de salaire`;
+
+    const ligneContrat = typeContratVal === 'CDD'
+      ? `Type de contrat : CDD (du ${cddDebutAffichee} au ${cddFinAffichee})`
+      : `Type de contrat : ${typeContratVal}`;
 
     const corps =
 `Société : ${societe}
@@ -321,6 +375,7 @@ Candidat : ${canPrenom} ${canNom}
 Salaire brut demandé : ${salaire} €
 Date prévisionnelle d'embauche : ${dateEmbaucheAffichee}
 Heures hebdomadaires : ${heuresHebdo} h
+${ligneContrat}
 
 Message :
 ${message}`;
@@ -331,6 +386,7 @@ ${message}`;
       corps: corps,
       societe, dirNom, dirPrenom, canNom, canPrenom, message,
       salaire, dateEmbauche, heuresHebdo,
+      typeContrat: typeContratVal, cddDebut: cddDebutVal, cddFin: cddFinVal,
       cv_base64: cvBase64,
       cv_nom_fichier: cvNomFichier
     };
@@ -349,6 +405,9 @@ ${message}`;
 
       afficherMsg('succes','✓ Votre demande a bien été envoyée à Fabienne LA CROIX.');
       form.reset();
+      blocCdd.style.display = 'none';
+      cddDebut.required = false;
+      cddFin.required = false;
       cvBase64 = null;
       cvNomFichier = null;
       zoneCv.classList.remove('rempli','actif');
